@@ -2,8 +2,8 @@
 <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.002.001.03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <CstmrPmtStsRpt>
         <GrpHdr>
-            <MsgId>{{ doc.msg_id }}</MsgId>
-            <CreDtTm>{{ doc.dttm }}</CreDtTm>
+            <MsgId>{{ data.msg_id }}</MsgId>
+            <CreDtTm>{{ data.dttm }}</CreDtTm>
             <CdtrAgt>
                 <FinInstnId>
                     <BIC>BOFIIE2D</BIC>
@@ -11,17 +11,18 @@
             </CdtrAgt>
         </GrpHdr>
         <OrgnlGrpInfAndSts>
-            <OrgnlMsgId>{{ doc.orig_msg_id }}</OrgnlMsgId>
+            <OrgnlMsgId>{{ data.orig_msg_id }}</OrgnlMsgId>
             <OrgnlMsgNmId>PAIN.008.001.02</OrgnlMsgNmId>
-            <OrgnlNbOfTxs>{{ doc.orig_tx_count }}</OrgnlNbOfTxs>
-            <OrgnlCtrlSum>{{ doc.orig_sum }}</OrgnlCtrlSum>
+            <OrgnlNbOfTxs>{{ data.orig_tx_count }}</OrgnlNbOfTxs>
+            <OrgnlCtrlSum>{{ data.orig_sum }}</OrgnlCtrlSum>
         </OrgnlGrpInfAndSts>
-        {% for batch in doc.batches %}
+        {% for batch in data.batches -%}
         <OrgnlPmtInfAndSts>
             <OrgnlPmtInfId>{{ batch.id }}</OrgnlPmtInfId>
             <OrgnlNbOfTxs>{{ batch.tx_count }}</OrgnlNbOfTxs>
             <OrgnlCtrlSum>{{ batch.sum }}</OrgnlCtrlSum>
-            {% for coll in batch.collections %}
+            {% for coll in batch.collections -%}
+            {% if 'reject_reason' in coll -%}
             <TxInfAndSts>
                 <StsId>{{ coll.sts_id }}</StsId>
                 <OrgnlEndToEndId>{{ coll.e2e_id }}</OrgnlEndToEndId>
@@ -97,8 +98,9 @@
                     </CdtrAcct>
                 </OrgnlTxRef>
             </TxInfAndSts>
-            {% endfor %}
+            {% endif -%}
+            {% endfor -%}
         </OrgnlPmtInfAndSts>
-        {% endfor %}
+        {% endfor -%}
     </CstmrPmtStsRpt>
 </Document>
