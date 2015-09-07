@@ -41,13 +41,13 @@ REASON_CODES = [
     ]
 
 
-def render_pacs2(data):
+def render_pain2(data):
     env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
     template = env.get_template('pain2.xml')
     return template.render(data=data)
 
 
-def build_pacs2(data, reasons_file=None):
+def build_pain2(data, reasons_file=None, default_reason=None):
     # Build dict mapping E2EID's to reason codes, if supplied
     reasons_mapping = {}
     if reasons_file is not None:
@@ -75,12 +75,18 @@ def build_pacs2(data, reasons_file=None):
         data.batches = [batch for batch in data.batches if batch.id in include_batches]
         for batch in data.batches:
             batch.collections = [coll for coll in batch.collections if coll.e2e_id in include_batches[batch.id]]
-    else:
+    elif default_reason is None:
         logger.info('Mapping not provided, using random reason codes')
         for batch in data.batches:
             for collection in batch.collections:
                 collection['reject_reason'] = REASON_CODES[randrange(len(REASON_CODES))]
-                collection['sts_id'] = 'RJCT' + unique_string('RJC')
+                collection['sts_id'] = unique_string('RJC')
+    else:
+        logger.info('Using provided reason code ({})'.format(default_reason))
+        for batch in data.batches:
+            for collection in batch.collections:
+                collection['reject_reason'] = default_reason
+                collection['sts_id'] = unique_string('RJC')
 
     data.orig_msg_id = data.msg_id
     data.orig_tx_count = data.tx_count
@@ -89,21 +95,26 @@ def build_pacs2(data, reasons_file=None):
     data.msg_id = unique_string()
     data.dttm = iso_datetime()
 
-    return render_pacs2(data)
+    return render_pain2(data)
 
 
 def main():
     parser = argparse.ArgumentParser(description='A pain.008 to pain.002 converter.')
     parser.add_argument('-i', '--input-pain8',
                         dest='pain8_file',
-                        help='The name of the pain.008 file to parse')
+                        help='The name of the pain.008 file to parse.')
     parser.add_argument('-o', '--output-pain2',
                         dest='pain2_file',
-                        help='The name of the pain.002 file to build')
+                        help='The name of the pain.002 file to build.')
     parser.add_argument('-r', '--reasons-file',
                         dest='reasons_file',
                         default=None,
-                        help='(Optional) CSV file mapping E2E ID\'s to reason codes')
+                        help='(Optional) CSV file mapping E2E ID\'s to reason codes.')
+    parser.add_argument('-d', '--default-reason',
+                        dest='default_reason',
+                        default=None,
+                        help='(Optional) Default reason code to use if mapping is not supplied.')
+
     args = parser.parse_args()
 
     if args.pain2_file is None:
@@ -111,10 +122,9 @@ def main():
 
     pain8 = Pain8Doc(args.pain8_file)
 
-    pacs2 = build_pacs2(pain8, args.reasons_file)
+    pacs2 = build_pain2(pain8, args.reasons_file, args.default_reason)
     with open(args.pain2_file, 'w') as f:
         f.write(pacs2)
 
 if __name__ == '__main__':
     main()
-

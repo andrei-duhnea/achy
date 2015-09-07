@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+          body {
+            padding: 60px 0px;
+          }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+          <div class="form-group">
+              <label for="pain8-file-select" >Select a pain.008 file: </label>
+              <input class="form-control" type="file" id="pain8-file-select" name="pain8-upload" />
+          </div>
+          <div class="form-group">
+              <label for="mappings-file-select">Select a reason mappings CSV file: </label>
+              <input class="form-control" type="file" id="mappings-file-select" name="mappings-upload" />
+              <p class="help-block">Optional - if provided must contain comma-separated entries mapping EndToEndId's to reject reason codes.</p>
+          </div>
+          <div class="form-group">
+              <label for="default-reason-text">Default reason code: </label>
+              <input class="form-control" type="text" id="default-reason-text" name="default-reason" />
+              <p class="help-block">Optional - if a mapping is not provided, this default reason code will be used for all collections, instead of randomly assigned codes.</p>
+          </div>
+          <input class="btn btn-default" type="submit" value="Submit" />
+        </form>
+    </div>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
