@@ -4,7 +4,7 @@ from helpers import Dotable
 
 class Pain8Doc(object):
 
-    def __init__(self, doc_file=None, ns_ver='pain.008.003.02'):
+    def __init__(self, doc_file=None, ns_ver=None):
         self.ns = {'pain8': 'urn:iso:std:iso:20022:tech:xsd:{}'.format(ns_ver)}
         self.tree = None
         self.root = None

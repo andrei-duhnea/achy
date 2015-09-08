@@ -103,6 +103,10 @@ def main():
     parser.add_argument('-i', '--input-pain8',
                         dest='pain8_file',
                         help='The name of the pain.008 file to parse.')
+    parser.add_argument('-v', '--pain8-version',
+                        dest='pain8_version',
+                        default='pain.008.001.02',
+                        help='The pain.008 schema version, defaults to "pain.008.001.02" .')
     parser.add_argument('-o', '--output-pain2',
                         dest='pain2_file',
                         help='The name of the pain.002 file to build.')
@@ -120,7 +124,7 @@ def main():
     if args.pain2_file is None:
         args.pain2_file = 'pain.002_' + timestamp_string() + '.xml'
 
-    pain8 = Pain8Doc(args.pain8_file)
+    pain8 = Pain8Doc(args.pain8_file, args.pain8_version)
 
     pacs2 = build_pain2(pain8, args.reasons_file, args.default_reason)
     with open(args.pain2_file, 'w') as f:
