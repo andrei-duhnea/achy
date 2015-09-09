@@ -17,11 +17,11 @@ def save_upload(upload):
             f.write(upload.file.read())
     return upload_path
 
-def make_pain2(pain2_file, pain8_file, mappings_file, default_reason):
-    pain8_data = Pain8Doc(pain8_file)
+def make_pain2(pain2_file, pain8_file, pain8_version, mappings_file, default_reason, expand):
+    pain8_data = Pain8Doc(pain8_file, pain8_version)
     if default_reason == '':
         default_reason = None
-    pain2 = build_pain2(pain8_data, mappings_file, default_reason)
+    pain2 = build_pain2(pain8_data, mappings_file, default_reason, expand)
     pain2_path = os.path.join(BUILD_DIR, pain2_file)
     with open(pain2_path, 'w') as f:
         f.write(pain2)
@@ -40,11 +40,12 @@ def upload_form():
 def do_upload():
     pain8_file = request.files.get('pain8-upload')
     pain8_name, pain8_ext = os.path.splitext(pain8_file.filename)
-    print(pain8_name)
     if pain8_ext not in ('.xml','.XML'):
         return 'Pain.008 file extension not allowed ({}).'.format(pain8_ext)
 
     pain8_path = save_upload(pain8_file)
+
+    pain8_version = request.forms.get('pain8-version')
 
     mappings_path = None
     mappings_file = request.files.get('mappings-upload')
@@ -52,8 +53,10 @@ def do_upload():
         mappings_path = save_upload(mappings_file)
 
     default_reason = request.forms.get('default-reason')
+    expand = not request.forms.get('compact')
     pain2_filename = 'pain.002_{}.xml'.format(timestamp_string())
-    make_pain2(pain2_filename, pain8_path, mappings_path, default_reason)
+
+    make_pain2(pain2_filename, pain8_path, pain8_version, mappings_path, default_reason, expand)
     redirect('/download/{}'.format(pain2_filename))
 
 @route('/download/<pain2_file>', method='GET')
