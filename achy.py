@@ -41,13 +41,14 @@ REASON_CODES = [
     ]
 
 
-def render_pain2(data):
+def render_pain2(data, expand=False):
     env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
-    template = env.get_template('pain2.xml')
+    template_name = 'pain2.xml' if expand else 'pain2_compact.xml'
+    template = env.get_template(template_name)
     return template.render(data=data)
 
 
-def build_pain2(data, reasons_file=None, default_reason=None):
+def build_pain2(data, reasons_file=None, default_reason=None, expand=False):
     # Build dict mapping E2EID's to reason codes, if supplied
     reasons_mapping = {}
     if reasons_file is not None:
@@ -95,7 +96,7 @@ def build_pain2(data, reasons_file=None, default_reason=None):
     data.msg_id = unique_string()
     data.dttm = iso_datetime()
 
-    return render_pain2(data)
+    return render_pain2(data, expand)
 
 
 def main():
@@ -118,6 +119,10 @@ def main():
                         dest='default_reason',
                         default=None,
                         help='(Optional) Default reason code to use if mapping is not supplied.')
+    parser.add_argument('-e', '--expanded',
+                        dest='expanded',
+                        action='store_true',
+                        help='Use non-compact (indented) pain.002 template. If missing compact template is used).')
 
     args = parser.parse_args()
 
@@ -126,7 +131,7 @@ def main():
 
     pain8 = Pain8Doc(args.pain8_file, args.pain8_version)
 
-    pacs2 = build_pain2(pain8, args.reasons_file, args.default_reason)
+    pacs2 = build_pain2(pain8, args.reasons_file, args.default_reason, args.expanded)
     with open(args.pain2_file, 'w') as f:
         f.write(pacs2)
 
