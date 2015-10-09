@@ -1,5 +1,5 @@
 from xml.etree import ElementTree
-from helpers import Dotable
+from .helpers import Dotable
 
 
 class Pain8Doc(object):

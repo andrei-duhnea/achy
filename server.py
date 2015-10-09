@@ -2,9 +2,9 @@ import os
 import bottle
 from bottle import Bottle, run, route, static_file, template, request, redirect
 
-from parser import Pain8Doc
-from achy import build_pain2
-from helpers import timestamp_string
+from achy.parser import Pain8Doc
+from achy.builder import build_pain2
+from achy.helpers import timestamp_string
 
 BUILD_DIR = 'build'
 UPLOAD_DIR = 'uploads'
@@ -13,7 +13,7 @@ bottle.TEMPLATE_PATH.append('templates')
 
 def save_upload(upload):
     upload_path = os.path.join(UPLOAD_DIR, upload.filename)
-    with open(upload_path, 'w') as f:
+    with open(upload_path, 'wb') as f:
             f.write(upload.file.read())
     return upload_path
 
